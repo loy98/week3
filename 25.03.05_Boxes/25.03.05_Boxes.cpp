@@ -39,7 +39,7 @@ struct Box {
 	bool _canMove = false;
 };
 void UpdateBoxRc(Box& box);
-void CheckCanMove(Box* boxes, int i, Box& smallBox);
+void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex);
 /*
 	1. 자동차그리기
 	2. 움직이기
@@ -91,6 +91,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	static Box boxes[2];
 	static Box smallBox;
+	static int activeIndex = 0;
 	switch (iMessage)
 	{
 	case WM_CREATE:
@@ -110,70 +111,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case 'A': case 'a':
+			boxes[activeIndex]._pt.x -= 5;
 			for (int i = 0; i < 2; ++i)
 				UpdateBoxRc(boxes[i]);
 			UpdateBoxRc(smallBox);
-			//if (RectHaveRect(boxes[0]._rc, smallBox._rc) && !RectInRect(boxes[0]._rc, boxes[1]._rc))
-			//{
-			//	boxes[0]._canMove = true;
-			//	boxes[1]._canMove = false;
 
-			//}
-			//else if(!RectInRect(boxes[0]._rc, boxes[1]._rc))
-			//{
-			//	boxes[0]._canMove = true;
-			//	smallBox._pt.x = boxes[0]._rc.right - smallBox._size / 2;
-			//	boxes[1]._canMove = false;
-			//}
-			//else if (RectInRect(boxes[0]._rc, boxes[1]._rc))
-			//{
-			//	boxes[0]._canMove = false;
-			//	smallBox._pt.x = boxes[1]._pt.x;
-			//	boxes[1]._canMove = true;
-			//}
-			for (int i = 0; i < 2; ++i)
-				CheckCanMove(boxes, i, smallBox);
-			for (int i = 0; i < 2; ++i)
-			{
-				if (boxes[i]._canMove)
-				{
-					boxes[i]._pt.x -= 5;
-				}
-			}
+			UpdateActiveIndex(boxes, smallBox, activeIndex);
 			break;
 		case 'D': case 'd':
+			boxes[activeIndex]._pt.x += 5;
 			for (int i = 0; i < 2; ++i)
 				UpdateBoxRc(boxes[i]);
 			UpdateBoxRc(smallBox);
-			//if (RectHaveRect(boxes[0]._rc, smallBox._rc) && !RectInRect(boxes[0]._rc, boxes[1]._rc))
-			//{
-			//	boxes[0]._canMove = true;
-			//	boxes[1]._canMove = false;
 
-			//}
-			//else if (!RectInRect(boxes[0]._rc, boxes[1]._rc))
-			//{
-			//	boxes[0]._canMove = true;
-			//	smallBox._pt.x = boxes[0]._rc.right - smallBox._size / 2;
-			//	boxes[1]._canMove = false;
-			//}
-			//else if (RectInRect(boxes[0]._rc, boxes[1]._rc))
-			//{
-			//	boxes[0]._canMove = false;
-			//	smallBox._pt.x = boxes[1]._pt.x;
-			//	boxes[1]._canMove = true;
-			//}
+			UpdateActiveIndex(boxes, smallBox, activeIndex);
+			break;
+		case 'W': case 'w':
+			boxes[activeIndex]._pt.y -= 5;
 			for (int i = 0; i < 2; ++i)
-				CheckCanMove(boxes, i, smallBox);
-			
+				UpdateBoxRc(boxes[i]);
+			UpdateBoxRc(smallBox);
+
+			UpdateActiveIndex(boxes, smallBox, activeIndex);
+			break;
+		case 'S': case 's':
+			boxes[activeIndex]._pt.y += 5;
 			for (int i = 0; i < 2; ++i)
-			{
-				
-				if (boxes[i]._canMove)
-				{
-					boxes[i]._pt.x += 10;
-				}
-			}
+				UpdateBoxRc(boxes[i]);
+			UpdateBoxRc(smallBox);
+
+			UpdateActiveIndex(boxes, smallBox, activeIndex);
 			break;
 		}
 		InvalidateRgn(g_hwnd, NULL, true);
@@ -205,42 +172,28 @@ void UpdateBoxRc(Box& box)
 	
 }
 
-void CheckCanMove(Box* boxes,int i, Box& smallBox)
-{
-	if (RectHaveRect(boxes[i % 2]._rc, smallBox._rc))
-	{
-		
-		if (!RectInRect(boxes[i % 2]._rc, boxes[(i + 1) % 2]._rc))
-		{
-			boxes[i % 2]._canMove = true;
-			
-			boxes[(i + 1) % 2]._canMove = false;
-			
-
-		}
-		else if (RectInRect(boxes[i % 2]._rc, boxes[(i + 1) % 2]._rc))
-		{
-			boxes[i % 2]._canMove = false;
-			smallBox._pt.x = boxes[(i + 1) % 2]._pt.x;
-			boxes[(i + 1) % 2]._canMove = true;
-		}
-		else
-		{
-			boxes[i % 2]._canMove = true;
-			boxes[(i + 1) % 2]._canMove = false;
-		}
-
-	}
-	else if (!RectInRect(boxes[i % 2]._rc, boxes[(i + 1) % 2]._rc))
-	{
-		boxes[i % 2]._canMove = true;
-
-		boxes[(i + 1) % 2]._canMove = false;
-		if (boxes[i % 2]._rc.left > smallBox._rc.left)
-			smallBox._pt.x = boxes[i % 2]._rc.left + smallBox._size / 2;
-		else if (boxes[i % 2]._rc.right < smallBox._rc.right)
-			smallBox._pt.x = boxes[i % 2]._rc.right - smallBox._size / 2;
-	}
-	//else if (RectInRect(boxes[i % 2]._rc, boxes[(i + 1) % 2]._rc))
+void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex) {
 	
+	int otherIndex = (activeIndex + 1) % 2;
+	if (!RectHaveRect(boxes[activeIndex]._rc, smallBox._rc)) {
+		if (!RectInRect(boxes[activeIndex]._rc, boxes[otherIndex]._rc))
+		{
+			if (smallBox._rc.left <= boxes[activeIndex]._rc.left)
+				smallBox._pt.x = boxes[activeIndex]._rc.left + smallBox._size / 2;
+			if (smallBox._rc.right >= boxes[activeIndex]._rc.right)
+				smallBox._pt.x = boxes[activeIndex]._rc.right - smallBox._size / 2;
+			if (smallBox._rc.top <= boxes[activeIndex]._rc.top)
+				smallBox._pt.y = boxes[activeIndex]._rc.top + smallBox._size / 2;
+			if (smallBox._rc.bottom >= boxes[activeIndex]._rc.bottom)
+				smallBox._pt.y = boxes[activeIndex]._rc.bottom - smallBox._size / 2;
+		}
+	}
+
+	// 두 상자 간 충돌 체크
+	if (RectInRect(boxes[activeIndex]._rc, boxes[otherIndex]._rc)) {
+		// 충돌 시, 작은 상자의 좌표를 다른 상자로 옮기고 제어권 전환
+		smallBox._pt.x = boxes[otherIndex]._pt.x;
+		smallBox._pt.y = boxes[otherIndex]._pt.y; // 필요하면 y 좌표도 업데이트
+		activeIndex = otherIndex;
+	}
 }
