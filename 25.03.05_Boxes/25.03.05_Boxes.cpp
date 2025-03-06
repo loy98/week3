@@ -193,7 +193,7 @@ void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex) {
 	if (RectInRect(boxes[activeIndex]._rc, boxes[otherIndex]._rc)) {
 		// 충돌 시, 작은 상자의 좌표를 다른 상자로 옮기고 제어권 전환
 		smallBox._pt.x = boxes[otherIndex]._pt.x;
-		smallBox._pt.y = boxes[otherIndex]._pt.y; // 필요하면 y 좌표도 업데이트
+		smallBox._pt.y = boxes[otherIndex]._pt.y;
 		activeIndex = otherIndex;
 	}
 }
