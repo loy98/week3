@@ -40,6 +40,19 @@ struct Box {
 };
 void UpdateBoxRc(Box& box);
 void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex);
+void UpdateIfReflect(Box boxes[2], Box& smallBox, int activeIndex, int dx, int dy);
+
+RECT GetRect(int left, int top, int width, int height)
+{
+	RECT rc = { left, top, left + width, top + height };
+	return rc;
+}
+RECT GetRectAtCenter(int x, int y, int width, int height)
+{
+	RECT rc = { x - width / 2, y - height / 2, x + width / 2, y + height / 2 };
+	return rc;
+}
+
 /*
 	1. 자동차그리기
 	2. 움직이기
@@ -92,6 +105,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	static Box boxes[2];
 	static Box smallBox;
 	static int activeIndex = 0;
+	static int dx = 0, dy = 0;
+
 	switch (iMessage)
 	{
 	case WM_CREATE:
@@ -108,41 +123,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		smallBox._pt.y = boxes[0]._pt.y;
 		break;
 	case WM_KEYDOWN:
+		dx = 0; dy = 0;
 		switch (wParam)
 		{
 		case 'A': case 'a':
-			boxes[activeIndex]._pt.x -= 5;
-			for (int i = 0; i < 2; ++i)
-				UpdateBoxRc(boxes[i]);
-			UpdateBoxRc(smallBox);
-
-			UpdateActiveIndex(boxes, smallBox, activeIndex);
+			dx = -5;
+			boxes[activeIndex]._pt.x += dx;
 			break;
 		case 'D': case 'd':
-			boxes[activeIndex]._pt.x += 5;
-			for (int i = 0; i < 2; ++i)
-				UpdateBoxRc(boxes[i]);
-			UpdateBoxRc(smallBox);
-
-			UpdateActiveIndex(boxes, smallBox, activeIndex);
+			dx = 5;
+			boxes[activeIndex]._pt.x += dx;
 			break;
 		case 'W': case 'w':
-			boxes[activeIndex]._pt.y -= 5;
-			for (int i = 0; i < 2; ++i)
-				UpdateBoxRc(boxes[i]);
-			UpdateBoxRc(smallBox);
-
-			UpdateActiveIndex(boxes, smallBox, activeIndex);
+			dy = -5;
+			boxes[activeIndex]._pt.y += dy;
 			break;
 		case 'S': case 's':
-			boxes[activeIndex]._pt.y += 5;
-			for (int i = 0; i < 2; ++i)
-				UpdateBoxRc(boxes[i]);
-			UpdateBoxRc(smallBox);
-
-			UpdateActiveIndex(boxes, smallBox, activeIndex);
+			dy = 5;
+			boxes[activeIndex]._pt.y += dy;
 			break;
 		}
+		for (int i = 0; i < 2; ++i)
+			UpdateBoxRc(boxes[i]);
+		UpdateBoxRc(smallBox);
+
+		UpdateActiveIndex(boxes, smallBox, activeIndex);
+		UpdateIfReflect(boxes, smallBox, activeIndex, dx, dy);
+
 		InvalidateRgn(g_hwnd, NULL, true);
 		break;
 	case WM_PAINT:
@@ -195,5 +202,14 @@ void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex) {
 		smallBox._pt.x = boxes[otherIndex]._pt.x;
 		smallBox._pt.y = boxes[otherIndex]._pt.y; // 필요하면 y 좌표도 업데이트
 		activeIndex = otherIndex;
+	}
+}
+void UpdateIfReflect(Box boxes[2], Box& smallBox, int activeIndex, int dx, int dy)
+{
+	if (RectInRect(boxes[activeIndex]._rc, boxes[(activeIndex + 1) % 2]._rc)) {
+		boxes[activeIndex]._pt.y += dy * 20;
+		boxes[activeIndex]._pt.x += dx * 20;
+		smallBox._pt.x = boxes[activeIndex]._pt.x;
+		smallBox._pt.y = boxes[activeIndex]._pt.y;
 	}
 }
