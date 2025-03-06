@@ -54,11 +54,15 @@ RECT GetRectAtCenter(int x, int y, int width, int height)
 }
 
 /*
-	1. 자동차그리기
-	2. 움직이기
-	3. 네모 동그라미 그리고 드래그 드랍
-	4. 별이되어라! -> 바닥에 네모 10개를 그린다 -> 마우스 드래그를 통해서 위로 이동을 시킨다
-				   -> 특정 높이 이상 위치에 드랍을 하면 네모 -> 별 모양으로 바뀐다.
+	실습 1. 플레이어(좌측)와 적(우측)을 하나씩 만든다.
+	플레이어는 w,s키로 상하 이동이 가능하다.
+	적은 자동으로 상하로 이동
+
+	실습 2. 마우스 왼쪽 버튼을 누르면 미사일을 발사
+	적도 랜덤 타이밍에 미사일을 발사
+
+	실습 3. 각자 미사일에 맞으면 사라진다...
+	적에게 맞거나 화면 밖으로 사라지면 재장전
 */
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
@@ -102,10 +106,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	PAINTSTRUCT ps;
+	/*
+		타이머 : 일정 시간마다 호출되는 이벤트
+	*/
+	static HANDLE hTimer;
+
+
 	static Box boxes[2];
 	static Box smallBox;
 	static int activeIndex = 0;
 	static int dx = 0, dy = 0;
+	HPEN MyPen, OldPen;
+	HBRUSH MyBrush, OldBrush;
 
 	switch (iMessage)
 	{
@@ -121,6 +133,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		smallBox._size = 50;
 		smallBox._pt.x = boxes[0]._pt.x;
 		smallBox._pt.y = boxes[0]._pt.y;
+
+		hTimer = (HANDLE)SetTimer(hWnd, 0, 100, NULL);
+		break;
+	case WM_TIMER:
+		dx = 5;
+		boxes[activeIndex]._pt.x += dx;
+		for (int i = 0; i < 2; ++i)
+			UpdateBoxRc(boxes[i]);
+		UpdateBoxRc(smallBox);
+
+		UpdateActiveIndex(boxes, smallBox, activeIndex);
+		UpdateIfReflect(boxes, smallBox, activeIndex, dx, dy);
+		InvalidateRgn(g_hwnd, NULL, true);
 		break;
 	case WM_KEYDOWN:
 		dx = 0; dy = 0;
@@ -154,14 +179,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(g_hwnd, &ps);
-
+		MyPen = CreatePen(PS_DASHDOT, 3, RGB(255, 0, 0));
+		OldPen = (HPEN)SelectObject(hdc, MyPen);
+		MyBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(255, 0, 0));
+		OldBrush = (HBRUSH)SelectObject(hdc, MyBrush);
+		//SelectObject 함수는 HGDIOBJ 반환, 이는 모든 GDI 기능의 어머니다 ex)HPEN
+		//Mypen 생성 후 SeclecObject로 생성한 MyPen을 집어서 사용하고, 다시 들고있는 펜을 예전 펜으로 바꾼 후 새로만들어서 사용했던 MyPen을 해제한다..
+		//Brush 도 같은 맥락이다!
 		for (int i = 0; i < 2; ++i)
+		{
+			if (i == activeIndex)
+			{
+				MyPen = CreatePen(PS_DASHDOT, 3, RGB(0, 255, 0));
+				OldPen = (HPEN)SelectObject(hdc, MyPen);
+				MyBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0, 255, 0));
+				OldBrush = (HBRUSH)SelectObject(hdc, MyBrush);
+			}
+			else
+			{
+				MyPen = CreatePen(PS_DASHDOT, 3, RGB(255, 0, 0));
+				OldPen = (HPEN)SelectObject(hdc, MyPen);
+				MyBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(255, 0, 0));
+				OldBrush = (HBRUSH)SelectObject(hdc, MyBrush);
+			}
 			RenderRectAtCenter(hdc, boxes[i]._pt.x, boxes[i]._pt.y, boxes[i]._size, boxes[i]._size);
 
+		}
+		SelectObject(hdc, OldPen);
+		DeleteObject(MyPen);
+		SelectObject(hdc, OldBrush);
+		DeleteObject(MyBrush);
+
+		MyPen = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
+		OldPen = (HPEN)SelectObject(hdc, MyPen);
+		MyBrush = CreateHatchBrush(HS_BDIAGONAL, RGB(0, 0, 255));
+		OldBrush = (HBRUSH)SelectObject(hdc, MyBrush);
 		RenderRectAtCenter(hdc, smallBox._pt.x, smallBox._pt.y, smallBox._size, smallBox._size);
-		
+		SelectObject(hdc, OldPen);
+		DeleteObject(MyPen);
+		SelectObject(hdc, OldBrush);
+		DeleteObject(MyBrush);
+
 		break;
 	case WM_DESTROY:
+		KillTimer(hWnd, 0);
 		PostQuitMessage(0); // 창을 끄면 프로그램이 종료됨
 		break;
 	}
@@ -178,11 +239,11 @@ void UpdateBoxRc(Box& box)
 	box._rc.top = box._pt.y - box._size / 2;
 	box._rc.right = box._pt.x + box._size / 2;
 	box._rc.bottom = box._pt.y + box._size / 2;
-	
+
 }
 
 void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex) {
-	
+
 	int otherIndex = (activeIndex + 1) % 2;
 	if (!RectHaveRect(boxes[activeIndex]._rc, smallBox._rc)) {
 		if (!RectInRect(boxes[activeIndex]._rc, boxes[otherIndex]._rc))
@@ -202,7 +263,7 @@ void UpdateActiveIndex(Box boxes[2], Box& smallBox, int& activeIndex) {
 	if (RectInRect(boxes[activeIndex]._rc, boxes[otherIndex]._rc)) {
 		// 충돌 시, 작은 상자의 좌표를 다른 상자로 옮기고 제어권 전환
 		smallBox._pt.x = boxes[otherIndex]._pt.x;
-		smallBox._pt.y = boxes[otherIndex]._pt.y;
+		smallBox._pt.y = boxes[otherIndex]._pt.y; // 필요하면 y 좌표도 업데이트
 		activeIndex = otherIndex;
 	}
 }
