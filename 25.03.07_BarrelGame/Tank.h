@@ -1,6 +1,6 @@
 #pragma once
-#include "pch.h"
 #include "BarrelGameObject.h"
+
 class Tank : public BarrelGameObject
 {
 public:
@@ -16,18 +16,21 @@ public:
 	void RotateBarrel(float angle);
 	void Dead();
 
+	POINT GetBarrelEnd() { return _barrelEnd; }
+	float GetBarrelAngle() { return _barrelAngle; }
 private:
-	POINT _pos;
+	POINT _pos{};
 	int _size;
 	float _damage;
 	string _name;
-	RECT _rc;
+	RECT _rc{};
 
-	POINT _barrrelEnd;
+	POINT _barrelEnd;
 	int _barrelSize;
 	float _barrelAngle;
 
 	//πÃªÁ¿œ
+
 };
 
 

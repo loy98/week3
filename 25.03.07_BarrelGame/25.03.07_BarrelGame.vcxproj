@@ -130,9 +130,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="25.03.07_BarrelGame.h" />
+    <ClInclude Include="CommonFunction.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="BarrelGameObject.h" />
     <ClInclude Include="BarrelMainGame.h" />
+    <ClInclude Include="Missile.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Tank.h" />
@@ -142,6 +144,7 @@
     <ClCompile Include="25.03.07_BarrelGame.cpp" />
     <ClCompile Include="BarrelGameObject.cpp" />
     <ClCompile Include="BarrelMainGame.cpp" />
+    <ClCompile Include="Missile.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>

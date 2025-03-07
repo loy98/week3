@@ -1,5 +1,8 @@
 #pragma once
+//#include "pch.h"
 #include "BarrelGameObject.h"
+class Tank;
+class Missile;
 class BarrelMainGame : public BarrelGameObject
 {
 public:
@@ -21,6 +24,7 @@ private:
 	wchar_t szText[128];
 
 	//Tank tank;
-
+	Tank* _tank;
+	Missile* _missile[10];
 };
 
