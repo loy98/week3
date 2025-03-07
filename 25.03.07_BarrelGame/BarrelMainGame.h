@@ -26,5 +26,8 @@ private:
 	//Tank tank;
 	Tank* _tank;
 	Missile* _missile[10];
+	Missile* _skillQ;
+
+	bool _isQUsed = true;
 };
 

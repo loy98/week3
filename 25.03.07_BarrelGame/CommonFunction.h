@@ -43,7 +43,7 @@ inline void RenderEllipse(HDC hdc, int x, int y, int width, int height)
 }
 
 // 가운데 기준
-inline void RenderEllipseAtCenter(HDC hdc, int centerX, int centerY, int width, int height)
+inline void RenderEllipseAtCenter(HDC hdc, float centerX, float centerY, float width, float height)
 {
 	Ellipse(hdc, centerX - (width / 2), centerY - (height / 2),
 		centerX + (width / 2), centerY + (height / 2));

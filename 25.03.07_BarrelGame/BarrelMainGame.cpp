@@ -43,6 +43,32 @@ void BarrelMainGame::Update()
 			}
 		}
 	}
+	if (_skillQ)
+	{
+		_skillQ->Update();
+		float firstAngle = _skillQ->GetAngle();
+		for (int i = 0; i < 36; ++i)
+		{
+			if (_skillQ->_fragments[i])
+				_skillQ->_fragments[i]->Update();
+
+		}
+		if (_skillQ->GetDist() > 200 && _isQUsed)
+		{
+			for (int i = 0; i < 36; ++i)
+			{
+				//Missile* fragment = _skillQ->_fragments[i];
+				LONG x = _skillQ->GetPos().x;
+				LONG y = _skillQ->GetPos().y;
+				
+				_skillQ->_fragments[i] = new Missile;
+				_skillQ->_fragments[i]->CreateMissile(x, y, MissileType::Fragment);
+				_skillQ->_fragments[i]->SetAngle(firstAngle + DEG_TO_RAD(10*i));
+			}
+			_isQUsed = false;
+		}
+	}
+	
 }
 
 void BarrelMainGame::Render(HDC hdc)
@@ -56,6 +82,17 @@ void BarrelMainGame::Render(HDC hdc)
 			_missile[i]->Render(hdc);
 		else
 			continue;
+	}
+	if (_skillQ)
+	{
+		_skillQ->Render(hdc);
+		for (int i = 0; i < 36; ++i)
+		{
+			//Missile* fragment = _skillQ->GetFragment(i);
+			if (_skillQ->_fragments[i])
+				_skillQ->_fragments[i]->Render(hdc);
+		}
+
 	}
 }
 
@@ -86,14 +123,19 @@ LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM
 				if (_missile[i] == nullptr)
 				{
 					_missile[i] = new Missile;
-					_missile[i]->CreateMissile(_tank->GetBarrelEnd().x, _tank->GetBarrelEnd().y);
+					_missile[i]->CreateMissile(_tank->GetBarrelEnd().x, _tank->GetBarrelEnd().y, MissileType::None);
 					_missile[i]->SetAngle(_tank->GetBarrelAngle());
 					break;
 				}
-				else
-					continue;
 			}
+			break;
 		case 'q': case 'Q':
+			if (_skillQ == nullptr)
+			{
+				_skillQ = new Missile;
+				_skillQ->CreateMissile(_tank->GetBarrelEnd().x, _tank->GetBarrelEnd().y, MissileType::Q);
+				_skillQ->SetAngle(_tank->GetBarrelAngle());
+			}
 			break;
 		}
 		break;

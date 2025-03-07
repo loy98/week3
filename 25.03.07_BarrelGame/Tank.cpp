@@ -54,16 +54,7 @@ void Tank::Move()
 
 void Tank::Fire()
 {
-	/*for (int i = 0; i < 10; ++i)
-	{
-		if (_missile[i] == nullptr)
-		{
-			_missile[i] = new Missile;
-			_missile[i]->CreateMissile(_barrelEnd.x, _barrelEnd.y);
-			_missile[i]->SetAngle(_barrelAngle);
-			break;
-		}
-	}*/
+
 }
 
 void Tank::RotateBarrel(float angle)
