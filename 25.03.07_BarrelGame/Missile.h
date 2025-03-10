@@ -12,19 +12,16 @@ public:
 	Missile();
 	~Missile();
 
-	void CreateMissile(int x, int y, MissileType type);
+	void CreateMissile(POINT pt, float angle, MissileType type);
+	void CreateFragments(POINT pt, float angle, MissileType type);
 
 	void Init();
 	void Release();
 	void Update();
 	void Render(HDC hdc);
 	
-	float GetAngle() { return _angle; }
-	void SetAngle(float angle) { _angle = angle; }
-	POINT GetPos() { return _pos; }
-	float GetDist() { return _dist; }
-	Missile* GetFragment(int index) { return _fragments[index]; }
-	Missile* _fragments[36] = { nullptr };
+	bool GetDeadChecked() { return _deadChecked; }
+	void SetDeadChecked(bool isDead) { _deadChecked = isDead; }
 
 private:
 	POINT _pos{};
@@ -35,7 +32,10 @@ private:
 	float _angle;
 	float _speed;
 	float _dist;
+	POINT _dir = {1, 1};
 
-	
+	Missile* _fragments[36] = { nullptr };
+	int _deadCount = 0;
+	bool _deadChecked = false;
 };
 

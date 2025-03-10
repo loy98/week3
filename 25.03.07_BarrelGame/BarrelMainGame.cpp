@@ -29,45 +29,7 @@ void BarrelMainGame::Update()
 {
 	if (_tank)
 		_tank->Update();
-	for (int i = 0; i < 10; ++i)
-	{
-		if (_missile[i] != nullptr)
-		{
-			_missile[i]->Update();
-			LONG x = _missile[i]->GetPos().x;
-			LONG y = _missile[i]->GetPos().y;
-			if (x < 0 || x > WINSIZE_X || y < 0 || y > WINSIZE_Y)
-			{
-				delete _missile[i];
-				_missile[i] = nullptr;
-			}
-		}
-	}
-	if (_skillQ)
-	{
-		_skillQ->Update();
-		float firstAngle = _skillQ->GetAngle();
-		for (int i = 0; i < 36; ++i)
-		{
-			if (_skillQ->_fragments[i])
-				_skillQ->_fragments[i]->Update();
 
-		}
-		if (_skillQ->GetDist() > 200 && _isQUsed)
-		{
-			for (int i = 0; i < 36; ++i)
-			{
-				//Missile* fragment = _skillQ->_fragments[i];
-				LONG x = _skillQ->GetPos().x;
-				LONG y = _skillQ->GetPos().y;
-				
-				_skillQ->_fragments[i] = new Missile;
-				_skillQ->_fragments[i]->CreateMissile(x, y, MissileType::Fragment);
-				_skillQ->_fragments[i]->SetAngle(firstAngle + DEG_TO_RAD(10*i));
-			}
-			_isQUsed = false;
-		}
-	}
 	
 }
 
@@ -76,24 +38,7 @@ void BarrelMainGame::Render(HDC hdc)
 	wsprintf(szText, TEXT("Mouse X : %d, Y : %d"), mousePosX, mousePosY);
 	TextOut(hdc, 20, 60, szText, wcslen(szText));
 	_tank->Render(hdc);
-	for (int i = 0; i < 10; ++i)
-	{
-		if (_missile[i])
-			_missile[i]->Render(hdc);
-		else
-			continue;
-	}
-	if (_skillQ)
-	{
-		_skillQ->Render(hdc);
-		for (int i = 0; i < 36; ++i)
-		{
-			//Missile* fragment = _skillQ->GetFragment(i);
-			if (_skillQ->_fragments[i])
-				_skillQ->_fragments[i]->Render(hdc);
-		}
 
-	}
 }
 
 LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
@@ -118,25 +63,13 @@ LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM
 			_tank->RotateBarrel(DEG_TO_RAD(-5));
 			break;
 		case ' ':
-			for (int i = 0; i < 10; ++i)
-			{
-				if (_missile[i] == nullptr)
-				{
-					_missile[i] = new Missile;
-					_missile[i]->CreateMissile(_tank->GetBarrelEnd().x, _tank->GetBarrelEnd().y, MissileType::None);
-					_missile[i]->SetAngle(_tank->GetBarrelAngle());
-					break;
-				}
-			}
+			_tank->Fire();
 			break;
 		case 'q': case 'Q':
-			if (_skillQ == nullptr)
-			{
-				_skillQ = new Missile;
-				_skillQ->CreateMissile(_tank->GetBarrelEnd().x, _tank->GetBarrelEnd().y, MissileType::Q);
-				_skillQ->SetAngle(_tank->GetBarrelAngle());
-			}
+			_tank->FireSkillQ();
 			break;
+		case 'e': case'E':
+			_tank->FireSkillE();
 		}
 		break;
 	case WM_LBUTTONDOWN:

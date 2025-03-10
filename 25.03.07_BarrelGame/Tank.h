@@ -1,5 +1,6 @@
 #pragma once
 #include "BarrelGameObject.h"
+class Missile;
 
 class Tank : public BarrelGameObject
 {
@@ -13,6 +14,8 @@ public:
 
 	void Move();
 	void Fire();
+	void FireSkillQ();
+	void FireSkillE();
 	void RotateBarrel(float angle);
 	void Dead();
 
@@ -30,7 +33,8 @@ private:
 	float _barrelAngle;
 
 	//πÃªÁ¿œ
-
+	Missile* _missiles[12] = { nullptr };
+	
 };
 
 
