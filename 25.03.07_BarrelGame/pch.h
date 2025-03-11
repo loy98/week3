@@ -11,6 +11,15 @@ using namespace std;
 #define DEG_TO_RAD(degree) degree* PI / 180
 extern HWND g_hWnd;
 
+struct FPOINT
+{
+	float x;
+	float y;
 
+	bool operator==(FPOINT& other)
+	{
+		return (x == other.x) && (y == other.y);
+	}
+};
 
 

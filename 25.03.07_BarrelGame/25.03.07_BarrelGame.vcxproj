@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClInclude Include="25.03.07_BarrelGame.h" />
     <ClInclude Include="CommonFunction.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="BarrelGameObject.h" />
     <ClInclude Include="BarrelMainGame.h" />
@@ -144,6 +145,7 @@
     <ClCompile Include="25.03.07_BarrelGame.cpp" />
     <ClCompile Include="BarrelGameObject.cpp" />
     <ClCompile Include="BarrelMainGame.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Missile.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

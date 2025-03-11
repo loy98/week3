@@ -49,7 +49,7 @@ inline void RenderEllipseAtCenter(HDC hdc, float centerX, float centerY, float w
 		centerX + (width / 2), centerY + (height / 2));
 }
 
-inline bool PointInRect(POINT ptMouse, RECT rc)
+inline bool PointInRect(FPOINT ptMouse, RECT rc)
 {
 	if (ptMouse.x < rc.left || ptMouse.x > rc.right
 		|| ptMouse.y < rc.top || ptMouse.y > rc.bottom)
@@ -69,7 +69,7 @@ inline bool RectInRect(RECT rc1, RECT rc2)
 	return true;
 }
 
-inline void UpdateRect(RECT& rc, POINT pt)
+inline void UpdateRect(RECT& rc, FPOINT pt)
 {
 	int width = rc.right - rc.left;
 	int height = rc.bottom - rc.top;

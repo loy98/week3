@@ -3,6 +3,7 @@
 #include "BarrelGameObject.h"
 class Tank;
 class Missile;
+class Enemy;
 class BarrelMainGame : public BarrelGameObject
 {
 public:
@@ -23,11 +24,11 @@ private:
 	int mousePosX = 0, mousePosY = 0;
 	wchar_t szText[128];
 
-	//Tank tank;
 	Tank* _tank;
-	Missile* _missile[10];
-	Missile* _skillQ;
+	Enemy* _enemies[5];
 
+	int _time = 0;
 	bool _isQUsed = true;
+	int _bulletCount = 5;
 };
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Tank.h"
 #include "Missile.h"
+#include "Enemy.h"
 #include "CommonFunction.h"
 Tank::Tank()
 {
@@ -25,8 +26,6 @@ void Tank::Init()
 	_barrelEnd.x = _pos.x;
 	_barrelEnd.y = _pos.y - _barrelSize;
 	_barrelAngle = 3.14f / 4.0f;
-	
-
 }
 
 void Tank::Release()
@@ -43,13 +42,39 @@ void Tank::Update()
 		if (_missiles[i])
 		{
 			_missiles[i]->Update();
-			if (_missiles[i]->GetDeadChecked())
+			if (_missiles[i]->GetIsDead())
 			{
 				delete _missiles[i];
 				_missiles[i] = nullptr;
 			}	
 		}
 	}
+}
+
+bool Tank::IsCollision(Enemy* enemy)
+{
+	for (int i = 0; i < 12; ++i)
+	{
+		if (_missiles[i])
+		{
+			float distX = _missiles[i]->GetPos().x - enemy->GetPos().x;
+			float distY = _missiles[i]->GetPos().y - enemy->GetPos().y;
+			double dist = sqrt(distX * distX + distY * distY);
+			if (dist < enemy->GetSize())
+			{
+				_missiles[i]->SetIsDead(true);
+				enemy->SetIsDead(true);
+			}
+			if (_missiles[i]->GetIsDead())
+			{
+				delete _missiles[i];
+				_missiles[i] = nullptr;
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void Tank::Render(HDC hdc)
@@ -65,7 +90,6 @@ void Tank::Render(HDC hdc)
 		if (_missiles[i])
 			_missiles[i]->Render(hdc);
 	}
-
 }
 
 void Tank::Move()
@@ -103,6 +127,19 @@ void Tank::FireSkillE()
 	{
 		_missiles[11] = new Missile;
 		_missiles[11]->CreateMissile(_barrelEnd, _barrelAngle, MissileType::E);
+	}
+}
+
+void Tank::FireGuidedMissile()
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		if (!_missiles[i])
+		{
+			_missiles[i] = new Missile;
+			_missiles[i]->CreateMissile(_barrelEnd, _barrelAngle, MissileType::Guided);
+			break;
+		}
 	}
 }
 

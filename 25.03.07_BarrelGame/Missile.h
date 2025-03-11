@@ -4,27 +4,34 @@ enum class MissileType
 	None,
 	Q,
 	E,
-	Fragment
+	Fragment,
+	Guided
 };
+class Enemy;
 class Missile
 {
 public:
 	Missile();
 	~Missile();
 
-	void CreateMissile(POINT pt, float angle, MissileType type);
-	void CreateFragments(POINT pt, float angle, MissileType type);
+	void CreateMissile(FPOINT pt, float angle, MissileType type);
+	void CreateFragments(FPOINT pt, float angle, MissileType type);
+	bool IsCollision(Enemy& enemy);
 
 	void Init();
 	void Release();
 	void Update();
 	void Render(HDC hdc);
 	
-	bool GetDeadChecked() { return _deadChecked; }
-	void SetDeadChecked(bool isDead) { _deadChecked = isDead; }
+	bool GetIsDead() { return _isDead; }
+	void SetIsDead(bool isDead) { _isDead = isDead; }
+	FPOINT GetPos() { return _pos; }
+	void SetTarget(Enemy* target) { _target = target; }
+	Enemy* GetTarget() { return _target; }
+	MissileType GetType() { return _type; }
 
 private:
-	POINT _pos{};
+	FPOINT _pos{};
 	int _size;
 	RECT _rc;
 	MissileType _type = MissileType::None;
@@ -32,10 +39,12 @@ private:
 	float _angle;
 	float _speed;
 	float _dist;
-	POINT _dir = {1, 1};
+	FPOINT _dir = {1, 1};
 
 	Missile* _fragments[36] = { nullptr };
 	int _deadCount = 0;
-	bool _deadChecked = false;
+	bool _isDead = false;
+
+	Enemy* _target = nullptr;
 };
 
