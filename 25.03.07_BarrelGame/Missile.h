@@ -16,7 +16,7 @@ public:
 
 	void CreateMissile(FPOINT pt, float angle, MissileType type);
 	void CreateFragments(FPOINT pt, float angle, MissileType type);
-	bool IsCollision(Enemy& enemy);
+	bool IsCollision(Enemy* enemy);
 
 	void Init();
 	void Release();

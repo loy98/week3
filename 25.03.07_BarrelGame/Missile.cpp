@@ -37,12 +37,12 @@ void Missile::CreateFragments(FPOINT pt, float angle, MissileType type)
 	}
 }
 
-bool Missile::IsCollision(Enemy& enemy)
+bool Missile::IsCollision(Enemy* enemy)
 {
-	double distX = _pos.x - enemy.GetPos().x;
-	double distY = _pos.y - enemy.GetPos().y;
+	double distX = _pos.x - enemy->GetPos().x;
+	double distY = _pos.y - enemy->GetPos().y;
 	double dist = sqrt(distX * distX + distY * distY);
-	if (dist < enemy.GetSize())
+	if (dist < enemy->GetSize())
 		return true;
 
 	return false;
@@ -109,15 +109,11 @@ void Missile::Update()
 			_isDead = true;
 		break;
 	case MissileType::Fragment:
-		if (_isDead)
-			return;
-		else
-			break;
+		if (_isDead)	return;
+		else    break;
 	case MissileType::Guided:
-		if (_isDead)
-			return;
-		if (_target)
-		{
+		if (_isDead)	return;
+		if (_target) {
 			float distX = _target->GetPos().x - _pos.x;
 			float distY = _target->GetPos().y - _pos.y;
 			float dist = sqrt(distX * distX + distY * distY);
@@ -139,10 +135,8 @@ void Missile::Update()
 void Missile::Render(HDC hdc)
 {
 	RenderEllipseAtCenter(hdc, _pos.x, _pos.y, _size, _size);
-	if (_type != MissileType::Q)
-		return;
-	for (int i = 0; i < 36; ++i)
-	{
+	if (_type != MissileType::Q)	return;
+	for (int i = 0; i < 36; ++i) {
 		if (_fragments[i])
 			_fragments[i]->Render(hdc);
 	}

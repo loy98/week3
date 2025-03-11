@@ -43,9 +43,6 @@ void BarrelMainGame::Update()
 			_enemies[i]->SetAngle(3.141592 - atan2(pt.y - tankPos.y, pt.x - tankPos.x));
 			break;
 		}
-	}
-	for (int i = 0; i < 5; ++i)
-	{
 		if (_enemies[i])
 			_enemies[i]->Move();
 	}
@@ -135,8 +132,9 @@ LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM
 				_bulletCount = 5;
 				_tank->FireGuidedMissile();
 			}
+			else
+				_tank->Fire();
 			_bulletCount--;
-			_tank->Fire();
 			break;
 		case 'q': case 'Q':
 			_tank->FireSkillQ();
