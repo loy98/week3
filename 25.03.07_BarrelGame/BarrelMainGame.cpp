@@ -3,6 +3,7 @@
 #include "Tank.h"
 #include "Missile.h"
 #include "Enemy.h"
+#include "RoundManager.h"
 BarrelMainGame::BarrelMainGame()
 {
 }
@@ -16,6 +17,10 @@ void BarrelMainGame::Init()
 	_tank = new Tank;
 	_tank->Init();
 	
+	_roundManager = new RoundManager;
+	_roundManager->Init();
+	_roundManager->SetTank(_tank);
+
 
 }
 
@@ -26,6 +31,8 @@ void BarrelMainGame::Release()
 		_tank->Release();
 		delete _tank;
 	}
+	_roundManager->Release();
+
 }
 
 void BarrelMainGame::Update()
@@ -33,12 +40,14 @@ void BarrelMainGame::Update()
 	if (_tank)
 		_tank->Update();
 	FPOINT tankPos = _tank->GetPos();
+	
 	for (int i = 0; i < 5; ++i)
 	{
 		if (!_enemies[i] && _time == 0)
 		{
 			_enemies[i] = new Enemy;
 			_enemies[i]->Init();
+    		_roundManager->SetEnemy(_enemies[i]);
 			FPOINT pt = _enemies[i]->GetPos();
 			_enemies[i]->SetAngle(3.141592 - atan2(pt.y - tankPos.y, pt.x - tankPos.x));
 			
@@ -66,7 +75,7 @@ void BarrelMainGame::Update()
 		}*/
 		if (_tank->IsCollision(_enemies[i]))
 		{
-			_tank->IncreaseKillCount();
+			// _tank->IncreaseKillCount();
 			delete _enemies[i];
 			_enemies[i] = nullptr;
 		}
@@ -93,6 +102,8 @@ void BarrelMainGame::Update()
 			}
 		}
 	}
+	_roundManager->Update();
+
 }
 
 void BarrelMainGame::Render(HDC hdc)
@@ -106,6 +117,7 @@ void BarrelMainGame::Render(HDC hdc)
 		if (_enemies[i])
 			_enemies[i]->Render(hdc);
 	}
+	_roundManager->Render(hdc);
 }
 
 LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
@@ -117,15 +129,32 @@ LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM
 		srand(static_cast<unsigned int>(time(nullptr)));
 		break;
 	case WM_TIMER:
-		if (_tank->GetIsDead())
-			break;
-		this->Update();
-		if (_time < 0)
-			_time = 50;
-		_time--;
-		if (_missileTime < 0)
-			_missileTime = 20;
-		_missileTime--;
+		if (_roundManager->GetIsClear())
+		{
+			_time = 1;
+			_missileTime = 1;
+			for (int i = 0; i < 5; ++i)
+			{
+				delete _enemies[i];
+				_enemies[i] = nullptr;
+			}
+			
+			_tank->FireSkillQ();
+			this->Update();
+		}
+		else
+		{
+			if (_tank->GetIsDead())
+				break;
+			this->Update();
+			if (_time < 0)
+				_time = _roundManager->GetEnemyFrequency();
+			_time--;
+			if (_missileTime < 0)
+				_missileTime = 20;
+			_missileTime--;
+		}
+		
 		InvalidateRect(g_hWnd, NULL, true);
 		break;
 	case WM_KEYDOWN:

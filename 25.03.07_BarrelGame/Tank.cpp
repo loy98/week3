@@ -26,7 +26,9 @@ void Tank::Init()
 	_barrelSize = 90;
 	_barrelEnd.x = _pos.x;
 	_barrelEnd.y = _pos.y - _barrelSize;
-	_barrelAngle = 3.14f / 4.0f;
+	_barrelAngle = 3.14f / 2.0f;
+
+	_killCount = 0;
 }
 
 void Tank::Release()
@@ -67,6 +69,7 @@ bool Tank::IsCollision(Enemy* enemy)
 			{
 				_missiles[i]->SetIsDead(true);
 				enemy->SetIsDead(true);
+				_killCount++;
 			}
 			if (_missiles[i]->GetIsDead())
 			{

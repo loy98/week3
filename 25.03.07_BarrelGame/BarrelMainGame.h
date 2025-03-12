@@ -4,6 +4,8 @@
 class Tank;
 class Missile;
 class Enemy;
+class RoundManager;
+
 class BarrelMainGame : public BarrelGameObject
 {
 public:
@@ -31,5 +33,9 @@ private:
 	int _missileTime = 1;
 	bool _isQUsed = true;
 	int _bulletCount = 5;
+
+	int _endCountDown = 30;
+
+	RoundManager* _roundManager;
 };
 

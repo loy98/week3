@@ -22,6 +22,8 @@ void Enemy::Init()
 	_size = 20;
 	_speed = 10;
 	_damage = 20;
+
+	_canFire = false;
 }
 
 void Enemy::Update()
@@ -54,13 +56,15 @@ void Enemy::Move()
 
 void Enemy::CreateMissile()
 {
-	for (int i = 0; i < 10; ++i)
-	{
-		if (!_missiles[i])
+	if (_canFire) {
+		for (int i = 0; i < 10; ++i)
 		{
-			_missiles[i] = new Missile;
-			_missiles[i]->CreateMissile(_pos, _angle, MissileType::Enemy);
-			break;
+			if (!_missiles[i])
+			{
+				_missiles[i] = new Missile;
+				_missiles[i]->CreateMissile(_pos, _angle, MissileType::Enemy);
+				break;
+			}
 		}
 	}
 }

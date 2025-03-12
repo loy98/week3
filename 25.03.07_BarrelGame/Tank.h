@@ -27,6 +27,7 @@ public:
 	int GetSize() { return _size; }
 	bool GetIsDead() { return _isDead; }
 	Missile* GetMissiles(int index) { return _missiles[index]; }
+	int GetKillCount() { return _killCount; }
 
 	void DecreaseHp(int damage) { _hp -= damage; }
 	void SetIsDead(bool isDead) { _isDead = isDead; }

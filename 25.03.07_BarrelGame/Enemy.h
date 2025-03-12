@@ -20,7 +20,9 @@ public:
 	int GetSize() { return _size; }
 	int GetDamage() { return _damage; }
 	float GetAngle() { return _angle; }
+	void SetFire(bool canFire) { _canFire = canFire; }
 
+	void SetHP(int hp) { _hp = hp; }
 	Missile* GetMissiles(int index) { return _missiles[index]; }
 	bool IsCollision(Tank* target);
 private:
@@ -31,6 +33,8 @@ private:
 	int _damage;
 	int _hp;
 
+	bool _canFire;
+	
 	bool _isDead = false;
 	Missile* _missiles[10] = { nullptr };
 	Tank* _target;

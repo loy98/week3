@@ -136,9 +136,17 @@ void Missile::Update()
 void Missile::Render(HDC hdc)
 {
 	RenderEllipseAtCenter(hdc, _pos.x, _pos.y, _size, _size);
-	if (_type != MissileType::Q)	return;
+	if (_type != MissileType::Q) {
+
+		return;
+	}
 	for (int i = 0; i < 36; ++i) {
+		HBRUSH MyBrush, OldBrush;
+		MyBrush = CreateSolidBrush(RGB(255, 0, 0));
+		OldBrush = (HBRUSH)SelectObject(hdc, MyBrush);
 		if (_fragments[i])
 			_fragments[i]->Render(hdc);
+		SelectObject(hdc, OldBrush);
+		DeleteObject(MyBrush);
 	}
 }
