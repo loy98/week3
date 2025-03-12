@@ -28,6 +28,7 @@ private:
 	Enemy* _enemies[5];
 
 	int _time = 0;
+	int _missileTime = 1;
 	bool _isQUsed = true;
 	int _bulletCount = 5;
 };

@@ -41,10 +41,15 @@ void BarrelMainGame::Update()
 			_enemies[i]->Init();
 			FPOINT pt = _enemies[i]->GetPos();
 			_enemies[i]->SetAngle(3.141592 - atan2(pt.y - tankPos.y, pt.x - tankPos.x));
+			
 			break;
 		}
 		if (_enemies[i])
-			_enemies[i]->Move();
+		{
+			_enemies[i]->Update();
+			if (_missileTime == 0)
+				_enemies[i]->CreateMissile();
+		}
 	}
 	
 	for (int i = 0; i < 5; ++i)
@@ -54,16 +59,19 @@ void BarrelMainGame::Update()
 		double distX = tankPos.x - _enemies[i]->GetPos().x;
 		double distY = tankPos.y - _enemies[i]->GetPos().y;
 		double dist = sqrt(distX * distX + distY * distY);
-		if (dist <= _tank->GetSize())
+		/*if (dist <= _tank->GetSize())
 		{
 			_tank->SetIsDead(true);
 			break;
-		}
+		}*/
 		if (_tank->IsCollision(_enemies[i]))
 		{
+			_tank->IncreaseKillCount();
 			delete _enemies[i];
 			_enemies[i] = nullptr;
 		}
+		_enemies[i]->IsCollision(_tank);
+
 	}
 	
 	for (int i = 0; i < 12; ++i)
@@ -115,6 +123,9 @@ LRESULT BarrelMainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM
 		if (_time < 0)
 			_time = 50;
 		_time--;
+		if (_missileTime < 0)
+			_missileTime = 20;
+		_missileTime--;
 		InvalidateRect(g_hWnd, NULL, true);
 		break;
 	case WM_KEYDOWN:

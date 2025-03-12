@@ -28,13 +28,17 @@ public:
 	bool GetIsDead() { return _isDead; }
 	Missile* GetMissiles(int index) { return _missiles[index]; }
 
+	void DecreaseHp(int damage) { _hp -= damage; }
 	void SetIsDead(bool isDead) { _isDead = isDead; }
+	void IncreaseKillCount() { _killCount++; }
 private:
 	FPOINT _pos{};
 	int _size;
 	float _damage;
 	string _name;
 	RECT _rc{};
+	int _hp;
+	int _maxHp;
 	bool _isDead = false;
 
 	FPOINT _barrelEnd;
@@ -43,7 +47,8 @@ private:
 
 	//πÃªÁ¿œ
 	Missile* _missiles[12] = { nullptr };
-	
+	int _killCount = 0;
+	wchar_t szText[128];
 };
 
 

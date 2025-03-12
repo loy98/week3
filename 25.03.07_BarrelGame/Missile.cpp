@@ -17,11 +17,12 @@ void Missile::CreateMissile(FPOINT pt, float angle, MissileType type)
 	_pos.y = pt.y;
 	_angle = angle;
 	
-	_size = 20;
+	_size = 10;
 	_speed = 20;
 	_rc = { (long)pt.x, (long)pt.y, _size, _size };
 	_type = type;
 	_dist = 0;
+	_damage = 10;
 }
 
 void Missile::CreateFragments(FPOINT pt, float angle, MissileType type)
@@ -75,7 +76,7 @@ void Missile::Update()
 			break;
 	case MissileType::Q:
 		if (_dist > 200)	
-			CreateFragments(_pos, _angle, MissileType::Fragment);
+			CreateFragments(_pos, _angle, MissileType::None);
 		for (int i = 0; i < 36; ++i) {
 			if (_fragments[i]) {
 				_fragments[i]->Update();

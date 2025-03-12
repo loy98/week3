@@ -19,6 +19,7 @@ void Tank::Init()
 	_size = 100;
 	_damage = 10;
 	_name = "탱크";
+	_hp = 100;
 	_rc = GetRectAtCenter(_pos.x, _pos.y, _size, _size);
 	
 	//포신 초기화
@@ -49,6 +50,8 @@ void Tank::Update()
 			}	
 		}
 	}
+	if (_hp <= 0)
+		_isDead = true;
 }
 
 bool Tank::IsCollision(Enemy* enemy)
@@ -74,6 +77,15 @@ bool Tank::IsCollision(Enemy* enemy)
 		}
 	}
 
+	float distX = _pos.x - enemy->GetPos().x;
+	float distY = _pos.y - enemy->GetPos().y;
+	double dist = sqrt(distX * distX + distY * distY);
+	if (dist < (enemy->GetSize() + _size)/2)
+	{
+		_hp -= enemy->GetDamage();
+		return true;
+	}
+
 	return false;
 }
 
@@ -90,6 +102,9 @@ void Tank::Render(HDC hdc)
 		if (_missiles[i])
 			_missiles[i]->Render(hdc);
 	}
+
+	wsprintf(szText, TEXT("Hp : %d"), _hp);
+	TextOut(hdc, 300, 60, szText, wcslen(szText));
 }
 
 void Tank::Move()

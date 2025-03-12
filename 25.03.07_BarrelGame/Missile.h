@@ -5,7 +5,8 @@ enum class MissileType
 	Q,
 	E,
 	Fragment,
-	Guided
+	Guided,
+	Enemy
 };
 class Enemy;
 class Missile
@@ -24,11 +25,14 @@ public:
 	void Render(HDC hdc);
 	
 	bool GetIsDead() { return _isDead; }
-	void SetIsDead(bool isDead) { _isDead = isDead; }
 	FPOINT GetPos() { return _pos; }
-	void SetTarget(Enemy* target) { _target = target; }
 	Enemy* GetTarget() { return _target; }
 	MissileType GetType() { return _type; }
+	int GetSize() { return _size; }
+	int GetDamage() { return _damage; }
+	
+	void SetIsDead(bool isDead) { _isDead = isDead; }
+	void SetTarget(Enemy* target) { _target = target; }
 
 private:
 	FPOINT _pos{};
@@ -39,6 +43,7 @@ private:
 	float _angle;
 	float _speed;
 	float _dist;
+	int _damage;
 	FPOINT _dir = {1, 1};
 
 	Missile* _fragments[36] = { nullptr };
